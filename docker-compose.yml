@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ruby_cinema_demo
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    command: bash -c "bundle install && rails db:migrate && rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    environment:
+      DB_NAME: ruby_cinema_demo
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: db
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+volumes:
+  postgres_data:
