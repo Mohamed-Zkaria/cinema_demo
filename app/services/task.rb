@@ -41,4 +41,43 @@ class Task
         end
 
     end
+
+
+    def self.reviews_importer(path)
+        path = File.join(Rails.root, path)
+        unless File.exist?(path)
+            puts "Files doesn't exist."
+            return           
+        end
+
+        movies_hash = {}
+
+        CSV.open( path, headers: true).lazy.each do |row|
+            begin
+                title = row['Movie']
+                user = row['User']
+                stars = row['Stars']
+                review = row['Review']
+      
+                unless(movies_hash[title])
+                    movies_hash[title] = movie = Movie.find_by(title: title)
+                end
+                
+                
+                review = movies_hash[title].reviews.new({
+                    title: title,
+                    user: user,
+                    stars: stars,
+                    review: review,
+                })
+                if review.save
+                    puts "Movie '#{review.title}' saved successfully."
+                else
+                    puts "Failed to save movie '#{review}'. Errors: #{review.errors.full_messages.join(', ')}"
+                end
+            rescue ActiveRecord::RecordNotUnique => e
+                puts "An error of type #{e.class} happened, message is #{e.message}"
+            end
+        end
+    end
 end

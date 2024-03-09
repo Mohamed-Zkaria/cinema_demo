@@ -3,4 +3,6 @@ class Review < ApplicationRecord
     validates :user, presence: true, length: { minimum: 3 } 
     validates :stars, presence: true, length: {minimum: 0, maximum: 5}
     validates :review, presence: true
+
+    belongs_to :movie
 end
